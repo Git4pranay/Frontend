@@ -84,7 +84,6 @@
 
 // export default App;
 
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import './App.css';
@@ -93,15 +92,23 @@ function App() {
     const [jsonInput, setJsonInput] = useState('');
     const [response, setResponse] = useState(null);
     const [selectedOptions, setSelectedOptions] = useState([]);
+    const [error, setError] = useState(null);
 
     const handleSubmit = async () => {
         try {
-            const jsonData = JSON.parse(jsonInput);
+            setError(null); 
+            const jsonData = JSON.parse(jsonInput); 
             const res = await axios.post('https://baja-mama-back.onrender.com/bfhl', { data: jsonData.data });
             setResponse(res.data);
             console.log(res);
         } catch (error) {
-            console.error('Invalid JSON or API Error', error);
+            if (error instanceof SyntaxError) {
+                setError('Invalid JSON format');
+            } else {
+                setError('API Error');
+                console.error('API Error', error);
+            }
+            setResponse(null); 
         }
     };
 
@@ -115,9 +122,10 @@ function App() {
     };
 
     return (
-      
         <div className="App">
-            <h1>Bajaj Finserv Health Dev Challenge Qualifier 1</h1><br /><h3>Pranay 21BPS1355</h3>
+            <h1>Bajaj Finserv Health Dev Challenge Qualifier 1</h1>
+            <br />
+            <h3>Pranay vit_21BPS1355</h3>
             <h3>API Input</h3>
             <input
                 type="text"
@@ -126,6 +134,8 @@ function App() {
                 placeholder='{"data":["M","1","334","4","B"]}'
             />
             <button onClick={handleSubmit}>Submit</button>
+
+            {error && <div style={{ color: 'red' }}>{error}</div>}
 
             <h4>Multi Filter</h4>
             <select multiple onChange={handleOptionChange}>
